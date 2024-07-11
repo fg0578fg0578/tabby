@@ -46,10 +46,11 @@ export interface components {
      */
     AnswerRequest: {
       user?: string | null;
-      messages: components["schemas"]["Message"][];
+      messages: components["schemas"]["ChatCompletionRequestMessage"][];
       code_query?: components["schemas"]["CodeSearchQuery"] | null;
       doc_query?: boolean;
       generate_relevant_questions?: boolean;
+      collect_relevant_code_using_user_message?: boolean;
     };
     AnswerResponseChunk: OneOf<[{
       relevant_code: components["schemas"]["CodeSearchDocument"][];
@@ -60,52 +61,6 @@ export interface components {
     }, {
       answer_delta: string;
     }]>;
-    ChatCompletionChoice: {
-      index: number;
-      logprobs?: string | null;
-      finish_reason?: string | null;
-      delta: components["schemas"]["ChatCompletionDelta"];
-    };
-    ChatCompletionChunk: {
-      id: string;
-      /** Format: int64 */
-      created: number;
-      system_fingerprint: string;
-      object: string;
-      model: string;
-      choices: components["schemas"]["ChatCompletionChoice"][];
-    };
-    ChatCompletionDelta: {
-      content: string;
-    };
-    /**
-     * @example {
-     *   "messages": [
-     *     {
-     *       "content": "What is tail recursion?",
-     *       "role": "user"
-     *     },
-     *     {
-     *       "content": "It's a kind of optimization in compiler?",
-     *       "role": "assistant"
-     *     },
-     *     {
-     *       "content": "Could you share more details?",
-     *       "role": "user"
-     *     }
-     *   ]
-     * }
-     */
-    ChatCompletionRequest: {
-      user?: string | null;
-      messages: components["schemas"]["Message"][];
-      /** Format: float */
-      temperature?: number | null;
-      /** Format: int64 */
-      seed?: number | null;
-      /** Format: float */
-      presence_penalty?: number | null;
-    };
     Choice: {
       /** Format: int32 */
       index: number;
@@ -121,7 +76,7 @@ export interface components {
     CodeSearchQuery: {
       git_url: string;
       filepath?: string | null;
-      language: string;
+      language?: string | null;
       content: string;
     };
     /**
@@ -235,10 +190,6 @@ export interface components {
       /** Format: int32 */
       elapsed?: number | null;
     };
-    Message: {
-      role: string;
-      content: string;
-    };
     Segments: {
       /** @description Content that appears before the cursor in the editor window. */
       prefix: string;
@@ -309,15 +260,13 @@ export interface operations {
   chat_completions: {
     requestBody: {
       content: {
-        "application/json": components["schemas"]["ChatCompletionRequest"];
+        "application/json": unknown;
       };
     };
     responses: {
       /** @description Success */
       200: {
-        content: {
-          "text/event-stream": components["schemas"]["ChatCompletionChunk"];
-        };
+        content: never;
       };
       /** @description When chat model is not specified, the endpoint returns 405 Method Not Allowed */
       405: {
