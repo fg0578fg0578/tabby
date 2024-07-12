@@ -1,6 +1,8 @@
 import type { ChatMessage } from 'tabby-chat-panel'
 import type { components as TabbyOpenApiComponents } from 'tabby-openapi'
 
+import { Repository } from '../gql/generates/graphql'
+
 export interface UserMessage extends ChatMessage {
   id: string
 }
@@ -60,4 +62,8 @@ export type AnswerResponse = {
   relevant_documents?: AnswerResponseChunk['relevant_documents']
   relevant_questions?: AnswerResponseChunk['relevant_questions']
   answer_delta?: AnswerResponseChunk['answer_delta']
+}
+
+export type AnswerEngineExtraContext = {
+  repository?: Omit<Repository, 'refs'>
 }
