@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  tabby-service:
+    # image: tabbyml/tabby
+    image: registry.cn-hangzhou.aliyuncs.com/pologuan/tabby_self-host-ai-code-assistant:0.13.1
+    container_name: tabby-container
+    entrypoint: /opt/tabby/bin/tabby-cpu
+    command: serve --model StarCoder-1B --chat-model Qwen2-1.5B-Instruct
+    ports:
+      - "58081:8080"
+    volumes:
+      - tabby_data:/data
+    tty: true
+    # interactive: true
+
+volumes:
+  tabby_data:  # 定义一个名为 tabby_data 的 Docker 卷
+    name: tabby_data
